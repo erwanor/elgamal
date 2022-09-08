@@ -56,17 +56,24 @@ impl PublicKey {
     ///        assert_eq!(sk.decrypt(&(ctxt1 * scalar_mult)), scalar_mult * ptxt1);
     /// # }
     /// ```
-    pub fn encrypt(self, message: &RistrettoPoint) -> Ciphertext {
-        let mut csprng: OsRng = OsRng;
-        let mut random: Scalar = Scalar::random(&mut csprng);
-
-        let random_generator = RISTRETTO_BASEPOINT_POINT * random;
-        let encrypted_plaintext = message + self.0 * random;
-        random.clear();
+    pub fn encrypt_with_blinding_factor(
+        self,
+        message: &RistrettoPoint,
+        mut blinding_factor: Scalar,
+    ) -> Ciphertext {
+        let random_generator = RISTRETTO_BASEPOINT_POINT * blinding_factor;
+        let encrypted_plaintext = message + self.0 * blinding_factor;
+        blinding_factor.clear();
         Ciphertext {
             pk: self,
             points: (random_generator, encrypted_plaintext),
         }
+    }
+
+    pub fn encrypt(self, message: &RistrettoPoint) -> Ciphertext {
+        let mut csprng: OsRng = OsRng;
+        let random: Scalar = Scalar::random(&mut csprng);
+        self.encrypt_with_blinding_factor(message, random)
     }
 
     /// Get the public key as a RistrettoPoint
@@ -241,7 +248,9 @@ impl PublicKey {
 
     /// Generate public key from bytes
     pub fn from_bytes(bytes: &[u8]) -> Option<PublicKey> {
-        Some(PublicKey(CompressedRistretto::from_slice(bytes).decompress()?))
+        Some(PublicKey(
+            CompressedRistretto::from_slice(bytes).decompress()?,
+        ))
     }
 }
 
