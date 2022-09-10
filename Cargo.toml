@@ -1,6 +1,6 @@
 [package]
 name = "elgamal_ristretto"
-version = "0.3"
+version = "0.3.0"
 authors = ["Inigo Querejeta Azurmendi <querejeta.inigo@gmail.com>", "Gonçalo Pestana <g6pestana@gmail.com>"]
 edition = "2018"
 exclude = ["**/.gitignore", ".gitignore","/target/*"]
@@ -14,7 +14,7 @@ license = "MIT"
 
 [dependencies]
 curve25519-dalek-ng = { version = "4.1.1", features = ["alloc"] }
-zkp = "0.8.0"
+zkp = { git = "https://github.com/erwanor/zkp.git" }
 rand_core = { version = "0.6.3", features = [ "getrandom" ] }
 sha2 = "0.9.0"
 clear_on_drop = { version = "0.2" }
